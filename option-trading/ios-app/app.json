@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Options Trader",
+    "slug": "options-trader",
+    "version": "1.0.0",
+    "newArchEnabled": false,
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0d1117",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.sam.optionstrader",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
+    },
+    "android": {
+      "package": "com.sam.optionstrader",
+      "usesCleartextTraffic": true
+    },
+    "plugins": []
+  }
+}

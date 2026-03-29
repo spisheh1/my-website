@@ -1,0 +1,14 @@
+{
+  "eval_id": 2,
+  "eval_name": "spy-high-vix-premium-sell",
+  "prompt": "SPY is trading at $510 and VIX just spiked to 32. I'm a premium seller - what's the best trade I can put on right now? Give me the specific strikes, expiration, credit, and how I manage it.",
+  "assertions": [
+    {"id": "a1", "text": "Recommends selling premium strategy (iron condor, credit spread, or similar) - not buying options"},
+    {"id": "a2", "text": "Explains WHY high VIX favors premium selling (volatility risk premium / IV mean reversion)"},
+    {"id": "a3", "text": "Provides specific put and call strike prices or delta guidance (~0.15-0.16 delta short strikes)"},
+    {"id": "a4", "text": "Recommends 30-45 DTE expiration"},
+    {"id": "a5", "text": "States a credit amount or range to collect"},
+    {"id": "a6", "text": "Gives 50% profit target as exit AND a stop-loss rule (e.g. 2x credit)"},
+    {"id": "a7", "text": "Mentions the 21 DTE rule or gamma risk near expiration"}
+  ]
+}

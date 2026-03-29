@@ -1,0 +1,25 @@
+{
+  "skill_name": "options-trading-mastery",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I think AAPL is going to rally before its next earnings in about 6 weeks. The stock is at $195 right now. IVR on AAPL is about 18. What options strategy should I use, what strikes, what expiration, and when should I take profit or cut losses?",
+      "expected_output": "Recommends a bullish strategy appropriate for low IVR (long call or bull call spread), specifies concrete strike selection near ATM or slightly OTM, recommends 45-60 DTE expiration, provides profit target and stop loss levels, and explains why the low IVR makes buying options favorable here."
+    },
+    {
+      "id": 2,
+      "prompt": "SPY is trading at $510 and VIX just spiked to 32. I'm a premium seller - what's the best trade I can put on right now? Give me the specific strikes, expiration, credit, and how I manage it.",
+      "expected_output": "Recommends selling premium (iron condor or credit spread on SPY) given high VIX, specifies strikes around 1 standard deviation OTM using delta as guide (~0.15-0.16), recommends 30-45 DTE, gives approximate credit to collect, management rules (close at 50% profit, stop at 2x credit), and explains the VRP edge."
+    },
+    {
+      "id": 3,
+      "prompt": "Can you explain the Greeks to me like I'm brand new to options? Especially how delta, theta, and vega affect my trades day to day.",
+      "expected_output": "Explains Delta, Theta, and Vega clearly for a beginner, uses concrete examples (e.g., 0.50 delta = $0.50 gain per $1 stock move), explains why theta decays and that it works against long options holders, explains IV/vega and how it affects option prices, uses relatable analogies."
+    },
+    {
+      "id": 4,
+      "prompt": "I sold an iron condor on TSLA for $3.50 credit. Strikes are: short put 200, long put 190, short call 260, long call 270. TSLA was at $230 when I entered. Now it's moved up to $252 and my short call side is being tested. What should I do - roll, close, or hold?",
+      "expected_output": "Advises on specific management decision for a tested iron condor - evaluates rolling options (when rolling makes sense and when it doesn't), discusses the 2x credit stop loss rule, considers time remaining to expiry in the decision, and gives a concrete recommendation rather than just listing options."
+    }
+  ]
+}

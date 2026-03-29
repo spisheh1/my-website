@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Listings | Sam Pisheh - Real Estate Broker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header & Navigation -->
+  <header class="header">
+    <nav class="nav">
+      <a href="index.html" class="nav-logo">Sam <span>Pisheh</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="listings.html" class="active">Listings</a></li>
+        <li><a href="neighborhoods.html">Neighborhoods</a></li>
+        <li><a href="blog.html">Blog</a></li>
+        <li><a href="testimonials.html">Testimonials</a></li>
+        <li><a href="contact.html" class="nav-cta">Schedule a Call</a></li>
+      </ul>
+      <button class="hamburger" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+  </header>
+
+    <!-- Page Hero -->
+    <section class="page-hero reveal">
+        <div class="container">
+            <h1>Property Listings</h1>
+            <div class="gold-line"></div>
+            <p>Discover Exceptional Homes Across the Bay Area</p>
+        </div>
+    </section>
+
+    <!-- Filter Bar -->
+    <section class="listings-filter">
+        <div class="container">
+            <div class="filter-row">
+                <select class="filter-select" id="location-filter">
+                    <option value="">All Locations</option>
+                    <option value="san-francisco">San Francisco</option>
+                    <option value="palo-alto">Palo Alto</option>
+                    <option value="mill-valley">Mill Valley</option>
+                    <option value="berkeley">Berkeley</option>
+                    <option value="sausalito">Sausalito</option>
+                </select>
+
+                <select class="filter-select" id="price-filter">
+                    <option value="">Any Price</option>
+                    <option value="under-1m">Under $1M</option>
+                    <option value="1m-2m">$1M-$2M</option>
+                    <option value="2m-3m">$2M-$3M</option>
+                    <option value="3m-5m">$3M-$5M</option>
+                    <option value="5m-plus">$5M+</option>
+                </select>
+
+                <select class="filter-select" id="type-filter">
+                    <option value="">All Types</option>
+                    <option value="single-family">Single Family</option>
+                    <option value="condo">Condo</option>
+                    <option value="townhouse">Townhouse</option>
+                </select>
+
+                <select class="filter-select" id="beds-filter">
+                    <option value="">Any</option>
+                    <option value="1plus">1+</option>
+                    <option value="2plus">2+</option>
+                    <option value="3plus">3+</option>
+                    <option value="4plus">4+</option>
+                    <option value="5plus">5+</option>
+                </select>
+
+                <button class="btn btn-gold" id="search-btn">Search</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Listings Grid -->
+    <section class="listings-page reveal">
+        <div class="container">
+            <div class="listing-grid">
+                <!-- Listing 1 -->
+                <div class="listing-card" data-location="san-francisco" data-price="4250000" data-type="single-family" data-beds="5">
+                    <div class="listing-image" style="background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80')">
+                        <span class="listing-badge featured">Featured</span>
+                    </div>
+                    <div class="listing-content">
+                        <p class="listing-price">$4,250,000</p>
+                        <h3 class="listing-address">2847 Pacific Heights Blvd</h3>
+                        <p class="listing-location">San Francisco, CA</p>
+                        <div class="listing-details">
+                            <span>5 bd</span>
+                            <span>4 ba</span>
+                            <span>3,200 sqft</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Listing 2 -->
+                <div class="listing-card" data-location="san-francisco" data-price="2150000" data-type="condo" data-beds="3">
+                    <div class="listing-image" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80')">
+                        <span class="listing-badge new">New</span>
+                    </div>
+                    <div class="listing-content">
+                        <p class="listing-price">$2,150,000</p>
+                        <h3 class="listing-address">1523 Noe Valley Lane</h3>
+                        <p class="listing-location">San Francisco, CA</p>
+                        <div class="listing-details">
+                            <span>3 bd</span>
+                            <span>2.5 ba</span>
+                            <span>2,100 sqft</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Listing 3 -->
+                <div class="listing-card" data-location="palo-alto" data-price="3750000" data-type="single-family" data-beds="4">
+                    <div class="listing-image" style="background-image: url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80')">
+                        <span class="listing-badge open-house">Open House</span>
+                    </div>
+                    <div class="listing-content">
+                        <p class="listing-price">$3,750,000</p>
+                        <h3 class="listing-address">456 Stanford Ave</h3>
+                        <p class="listing-location">Palo Alto, CA</p>
+                        <div class="listing-details">
+                            <span>4 bd</span>
+                            <span>3.5 ba</span>
+                            <span>2,800 sqft</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Listing 4 -->
+                <div class="listing-card" data-location="mill-valley" data-price="1850000" data-type="single-family" data-beds="3">
+                    <div class="listing-image" style="background-image: url('https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800&q=80')">
+                        <span class="listing-badge new">New</span>
+                    </div>
+                    <div class="listing-content">
+                        <p class="listing-price">$1,850,000</p>
+                        <h3 class="listing-address">789 Elm St</h3>
+                        <p class="listing-location">Mill Valley, CA</p>
+                        <div class="listing-details">
+                            <span>3 bd</span>
+                            <span>2 ba</span>
+                            <span>1,950 sqft</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Listing 5 -->
+                <div class="listing-card" data-location="berkeley" data-price="1450000" data-type="condo" data-beds="2">
+                    <div class="listing-image" style="background-image: url('https://images.unsplash.com/photo-1600573472592-401b489a3cdc?w=800&q=80')">
+                        <span class="listing-badge featured">Featured</span>
+                    </div>
+                    <div class="listing-content">
+                        <p class="listing-price">$1,450,000</p>
+                        <h3 class="listing-address">234 University Ave</h3>
+                        <p class="listing-location">Berkeley, CA</p>
+                        <div class="listing-details">
+                            <span>2 bd</span>
+                            <span>2 ba</span>
+                            <span>1,400 sqft</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Listing 6 -->
+                <div class="listing-card" data-location="sausalito" data-price="2800000" data-type="single-family" data-beds="3">
+                    <div class="listing-image" style="background-image: url('https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&q=80')">
+                        <span class="listing-badge waterfront">Waterfront</span>
+                    </div>
+                    <div class="listing-content">
+                        <p class="listing-price">$2,800,000</p>
+                        <h3 class="listing-address">567 Bridgeway</h3>
+                        <p class="listing-location">Sausalito, CA</p>
+                        <div class="listing-details">
+                            <span>3 bd</span>
+                            <span>3 ba</span>
+                            <span>2,400 sqft</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section reveal">
+        <div class="container">
+            <h2>Didn't Find What You're Looking For?</h2>
+            <p>Let us help you discover your dream home in the Bay Area</p>
+            <a href="contact.html" class="btn btn-gold">Schedule a Call</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Sam Pisheh</h4>
+                    <p>Real Estate Broker</p>
+                    <p class="dre-number">DRE 02229956</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <p>Broker: Brent Turner</p>
+                    <p>Turner Real Estate</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Service Area</h4>
+                    <p>San Francisco Bay Area</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Equal Housing</h4>
+                    <p>We are committed to equal opportunity in real estate. Fair Housing is everyone's responsibility.</p>
+                </div>
+            </div>
+                        <div class="footer-bottom">
+                <div class="footer-legal">
+                    <p>&copy; 2026 Sam Pisheh Real Estate. All rights reserved.</p>
+                    <p>DRE License #02229956 | Broker: Brent Turner, Turner Real Estate</p>
+                </div>
+                <div class="equal-housing">
+                    <div class="equal-housing-icon">EHO</div>
+                    <span>Equal Housing Opportunity</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // Hamburger Toggle
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    });
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        navLinks.classList.remove('active');
+      });
+    });
+
+    // Header Scroll Effect
+    const header = document.querySelector('.header');
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // Scroll Reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

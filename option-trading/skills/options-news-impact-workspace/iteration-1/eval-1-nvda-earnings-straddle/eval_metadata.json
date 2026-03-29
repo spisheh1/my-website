@@ -1,0 +1,13 @@
+{
+  "eval_id": 1,
+  "eval_name": "nvda-earnings-straddle",
+  "prompt": "NVDA reports earnings next Tuesday after close. The stock is at $880. The ATM straddle is priced at $45. IVR is 82. I'm thinking of buying a straddle. Is that smart? What would you do instead?",
+  "assertions": [
+    {"id": "a1", "text": "Advises AGAINST buying the straddle due to high IVR (82) and IV crush risk"},
+    {"id": "a2", "text": "Calculates or mentions the expected move (~$45 = ~5% move) from the straddle price"},
+    {"id": "a3", "text": "Explains IV crush - that IV collapses after earnings regardless of direction"},
+    {"id": "a4", "text": "Recommends at least one alternative strategy (iron condor, credit spread, or post-earnings directional play)"},
+    {"id": "a5", "text": "Mentions the ~70% stat or concept that most stocks move LESS than the expected move"},
+    {"id": "a6", "text": "Gives specific alternative trade details (not just 'sell premium' in vague terms)"}
+  ]
+}

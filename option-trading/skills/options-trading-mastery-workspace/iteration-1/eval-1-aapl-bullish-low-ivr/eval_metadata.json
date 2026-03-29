@@ -1,0 +1,13 @@
+{
+  "eval_id": 1,
+  "eval_name": "aapl-bullish-low-ivr",
+  "prompt": "I think AAPL is going to rally before its next earnings in about 6 weeks. The stock is at $195 right now. IVR on AAPL is about 18. What options strategy should I use, what strikes, what expiration, and when should I take profit or cut losses?",
+  "assertions": [
+    {"id": "a1", "text": "Recommends a bullish strategy appropriate for low IVR (long call or bull call spread, NOT selling premium)"},
+    {"id": "a2", "text": "Explicitly mentions that low IVR (18) makes buying options favorable"},
+    {"id": "a3", "text": "Provides specific strike prices or delta guidance (e.g. ATM, 0.50 delta, or a specific dollar strike)"},
+    {"id": "a4", "text": "Recommends 30-60 DTE expiration to balance theta decay and time for the move"},
+    {"id": "a5", "text": "Gives both a profit target AND a stop loss / exit rule"},
+    {"id": "a6", "text": "Mentions position sizing or risk management (% of account or contract count)"}
+  ]
+}

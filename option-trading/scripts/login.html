@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Options Trader — Sign In</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0d1117;--surface:#161b22;--surface2:#21262d;
+  --border:#30363d;--text:#e6edf3;--text2:#8b949e;--text3:#484f58;
+  --green:#3fb950;--red:#f85149;--blue:#58a6ff;--orange:#f0b429;
+  --teal:#39d353;
+}
+html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--text);}
+
+/* ── Background grid ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(63,185,80,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(63,185,80,.04) 1px,transparent 1px);
+  background-size:40px 40px;pointer-events:none;z-index:0;
+}
+
+/* ── Candlestick decoration ── */
+.bg-chart{
+  position:fixed;bottom:0;left:0;right:0;height:180px;
+  pointer-events:none;z-index:0;opacity:.07;
+  display:flex;align-items:flex-end;gap:8px;padding:0 40px;overflow:hidden;
+}
+.bc{width:14px;background:var(--green);border-radius:2px 2px 0 0;flex-shrink:0;}
+
+/* ── Main wrapper ── */
+.wrap{
+  position:relative;z-index:1;
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:20px;
+}
+
+/* ── Brand header ── */
+.brand{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:32px;text-align:center;flex-direction:column;
+}
+.brand-icon{
+  width:56px;height:56px;background:var(--surface);
+  border:1px solid var(--border);border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 24px rgba(63,185,80,.2);
+}
+.brand-icon svg{width:32px;height:32px;}
+.brand-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
+.brand-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+
+/* ── Card ── */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:32px 28px;width:100%;max-width:400px;
+  box-shadow:0 8px 40px rgba(0,0,0,.4);
+}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:0;margin-bottom:24px;background:var(--surface2);border-radius:10px;padding:4px;}
+.tab-btn{
+  flex:1;padding:8px 0;border:none;background:transparent;
+  color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;
+  border-radius:8px;transition:all .15s;
+}
+.tab-btn.active{background:var(--border);color:var(--text);}
+.tab-btn:hover:not(.active){color:var(--text);}
+
+/* ── Forms ── */
+.form-section{display:none;}
+.form-section.active{display:block;}
+
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;letter-spacing:.3px;}
+.field input{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:10px 14px;font-size:14px;color:var(--text);
+  outline:none;transition:border-color .15s;
+  -webkit-appearance:none;
+}
+.field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(88,166,255,.1);}
+.field input::placeholder{color:var(--text3);}
+.field input.error{border-color:var(--red);}
+
+/* ── Submit button ── */
+.btn-submit{
+  width:100%;padding:11px;background:var(--green);
+  border:none;border-radius:8px;color:#0d1117;
+  font-size:14px;font-weight:800;cursor:pointer;
+  transition:all .15s;margin-top:4px;letter-spacing:.3px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-submit:hover{background:#4ac95e;transform:translateY(-1px);box-shadow:0 4px 16px rgba(63,185,80,.3);}
+.btn-submit:active{transform:translateY(0);}
+.btn-submit:disabled{background:var(--border);color:var(--text3);cursor:not-allowed;transform:none;box-shadow:none;}
+
+/* ── Spinner ── */
+.spin{width:16px;height:16px;border:2px solid rgba(0,0,0,.2);border-top-color:#0d1117;border-radius:50%;animation:spin .6s linear infinite;display:none;}
+.loading .spin{display:block;}
+.loading .btn-text{display:none;}
+
+/* ── Error / success messages ── */
+.msg{
+  padding:10px 14px;border-radius:8px;font-size:13px;
+  margin-bottom:16px;display:none;align-items:flex-start;gap:8px;
+}
+.msg.show{display:flex;}
+.msg.err{background:#4a1a1a;border:1px solid rgba(248,81,73,.3);color:var(--red);}
+.msg.ok{background:#162016;border:1px solid rgba(63,185,80,.3);color:var(--green);}
+
+/* ── Divider ── */
+.divider{text-align:center;color:var(--text3);font-size:11px;margin:16px 0;position:relative;}
+.divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border);}
+.divider::before{left:0;}.divider::after{right:0;}
+
+/* ── Footer ── */
+.card-footer{margin-top:20px;text-align:center;font-size:12px;color:var(--text3);}
+.card-footer a{color:var(--blue);text-decoration:none;cursor:pointer;}
+.card-footer a:hover{text-decoration:underline;}
+
+/* ── Optional tag ── */
+.opt-tag{font-size:10px;color:var(--text3);font-weight:400;margin-left:4px;}
+
+/* ── Password strength ── */
+.pw-strength{height:3px;border-radius:2px;margin-top:6px;background:var(--border);overflow:hidden;}
+.pw-strength-bar{height:100%;width:0;border-radius:2px;transition:width .3s, background .3s;}
+
+@keyframes spin{to{transform:rotate(360deg);}}
+
+@media(max-width:440px){
+  .card{padding:24px 18px;}
+  .brand-name{font-size:18px;}
+}
+</style>
+</head>
+<body>
+
+<!-- Background candles decoration -->
+<div class="bg-chart" id="bgChart"></div>
+
+<div class="wrap">
+  <div class="brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polyline points="3,24 9,14 15,18 22,8 29,12" fill="none" stroke="#3fb950" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="29" cy="12" r="2" fill="#3fb950"/>
+        <line x1="8" y1="4" x2="8" y2="8" stroke="#3fb950" stroke-width="2" stroke-linecap="round"/>
+        <rect x="6" y="8" width="4" height="8" rx="1" fill="#3fb950"/>
+        <line x1="8" y1="16" x2="8" y2="20" stroke="#3fb950" stroke-width="2" stroke-linecap="round"/>
+        <line x1="20" y1="18" x2="20" y2="22" stroke="#f85149" stroke-width="2" stroke-linecap="round"/>
+        <rect x="18" y="22" width="4" height="6" rx="1" fill="#f85149"/>
+        <line x1="20" y1="28" x2="20" y2="30" stroke="#f85149" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">Options Trader</div>
+      <div class="brand-sub">AI-powered live options scanner</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+      <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Create Account</button>
+    </div>
+
+    <!-- ── LOGIN FORM ── -->
+    <div class="form-section active" id="section-login">
+      <div class="msg err" id="login-err"><span>⚠</span><span id="login-err-text"></span></div>
+
+      <div class="field">
+        <label>USERNAME</label>
+        <input type="text" id="login-user" placeholder="your username" autocomplete="username" autocapitalize="none" spellcheck="false">
+      </div>
+      <div class="field">
+        <label>PASSWORD</label>
+        <input type="password" id="login-pass" placeholder="your password" autocomplete="current-password">
+      </div>
+
+      <button class="btn-submit" id="login-btn" onclick="doLogin()">
+        <div class="spin" id="login-spin"></div>
+        <span class="btn-text">Sign In →</span>
+      </button>
+    </div>
+
+    <!-- ── REGISTER FORM ── -->
+    <div class="form-section" id="section-register">
+      <div class="msg err" id="reg-err"><span>⚠</span><span id="reg-err-text"></span></div>
+      <div class="msg ok"  id="reg-ok"><span>✓</span><span>Account created! Signing you in…</span></div>
+
+      <div class="field">
+        <label>USERNAME</label>
+        <input type="text" id="reg-user" placeholder="choose a username" autocomplete="username" autocapitalize="none" spellcheck="false" oninput="checkUsername()">
+      </div>
+      <div class="field">
+        <label>PASSWORD</label>
+        <input type="password" id="reg-pass" placeholder="at least 4 characters" autocomplete="new-password" oninput="checkPwStrength()">
+        <div class="pw-strength"><div class="pw-strength-bar" id="pw-bar"></div></div>
+      </div>
+      <div class="field">
+        <label>EMAIL <span class="opt-tag">(optional — for account recovery)</span></label>
+        <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email">
+      </div>
+
+      <button class="btn-submit" id="reg-btn" onclick="doRegister()">
+        <div class="spin" id="reg-spin"></div>
+        <span class="btn-text">Create Account →</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    Options Trader · <a href="#" onclick="event.preventDefault()">Privacy</a>
+  </div>
+</div>
+
+<script>
+// ── Background candles ────────────────────────────────────────────────────────
+(function(){
+  const c=document.getElementById('bgChart');
+  const heights=[40,70,55,90,45,110,80,60,95,50,75,40,85,65,100,55,70,45,90,60,80,50,110,70,40,95,55,75,85,45];
+  heights.forEach(h=>{
+    const el=document.createElement('div');
+    el.className='bc';
+    el.style.height=h+'px';
+    el.style.opacity=Math.random()*0.5+0.5+'';
+    c.appendChild(el);
+  });
+})();
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+function switchTab(t){
+  document.getElementById('tab-login').classList.toggle('active', t==='login');
+  document.getElementById('tab-register').classList.toggle('active', t==='register');
+  document.getElementById('section-login').classList.toggle('active', t==='login');
+  document.getElementById('section-register').classList.toggle('active', t==='register');
+  hideErrors();
+}
+
+function hideErrors(){
+  ['login-err','reg-err','reg-ok'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.remove('show');
+  });
+}
+
+function showErr(msgId, textId, text){
+  const m=document.getElementById(msgId), t=document.getElementById(textId);
+  if(t) t.textContent=text;
+  if(m) m.classList.add('show');
+}
+
+// ── Password strength ─────────────────────────────────────────────────────────
+function checkPwStrength(){
+  const v=document.getElementById('reg-pass').value;
+  const bar=document.getElementById('pw-bar');
+  let score=0;
+  if(v.length>=4) score++;
+  if(v.length>=8) score++;
+  if(/[A-Z]/.test(v)||/[0-9]/.test(v)) score++;
+  if(/[^A-Za-z0-9]/.test(v)) score++;
+  const widths=[0,30,55,80,100];
+  const colors=['','#f85149','#f0b429','#3fb950','#3fb950'];
+  bar.style.width=widths[score]+'%';
+  bar.style.background=colors[score];
+}
+
+function checkUsername(){
+  const v=document.getElementById('reg-user').value;
+  const inp=document.getElementById('reg-user');
+  inp.classList.toggle('error', v.length>0 && v.length<3);
+}
+
+// ── Login ─────────────────────────────────────────────────────────────────────
+async function doLogin(){
+  const u=document.getElementById('login-user').value.trim();
+  const p=document.getElementById('login-pass').value;
+  if(!u||!p){ showErr('login-err','login-err-text','Please enter your username and password.'); return; }
+  hideErrors();
+  setLoading('login',true);
+  try{
+    const r=await fetch('/api/auth/login',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username:u,password:p})
+    });
+    const d=await r.json();
+    if(r.ok){
+      window.location.href='/trading/';
+    } else {
+      showErr('login-err','login-err-text', d.error||'Login failed.');
+      setLoading('login',false);
+    }
+  }catch(e){
+    showErr('login-err','login-err-text','Network error — please try again.');
+    setLoading('login',false);
+  }
+}
+
+// ── Register ──────────────────────────────────────────────────────────────────
+async function doRegister(){
+  const u=document.getElementById('reg-user').value.trim();
+  const p=document.getElementById('reg-pass').value;
+  const e=document.getElementById('reg-email').value.trim();
+  hideErrors();
+  if(!u){ showErr('reg-err','reg-err-text','Username is required.'); return; }
+  if(u.length<3){ showErr('reg-err','reg-err-text','Username must be at least 3 characters.'); return; }
+  if(!p||p.length<4){ showErr('reg-err','reg-err-text','Password must be at least 4 characters.'); return; }
+  setLoading('reg',true);
+  try{
+    const r=await fetch('/api/auth/register',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username:u,password:p,email:e})
+    });
+    const d=await r.json();
+    if(r.ok){
+      document.getElementById('reg-ok').classList.add('show');
+      setTimeout(()=>{ window.location.href='/trading/'; }, 800);
+    } else {
+      showErr('reg-err','reg-err-text', d.error||'Registration failed.');
+      setLoading('reg',false);
+    }
+  }catch(e){
+    showErr('reg-err','reg-err-text','Network error — please try again.');
+    setLoading('reg',false);
+  }
+}
+
+// ── Loading state ─────────────────────────────────────────────────────────────
+function setLoading(prefix, on){
+  const btn=document.getElementById(prefix+'-btn');
+  if(on){ btn.classList.add('loading'); btn.disabled=true; }
+  else { btn.classList.remove('loading'); btn.disabled=false; }
+  const spin=document.getElementById(prefix+'-spin');
+  if(spin) spin.style.display=on?'block':'none';
+}
+
+// ── Enter key support ──────────────────────────────────────────────────────────
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Enter') return;
+  const login=document.getElementById('section-login');
+  const reg=document.getElementById('section-register');
+  if(login.classList.contains('active')) doLogin();
+  else if(reg.classList.contains('active')) doRegister();
+});
+
+// ── Auto-focus ────────────────────────────────────────────────────────────────
+window.addEventListener('load', function(){
+  const u=document.getElementById('login-user');
+  if(u) setTimeout(()=>u.focus(), 100);
+});
+</script>
+</body>
+</html>

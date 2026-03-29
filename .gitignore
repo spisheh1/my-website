@@ -1,0 +1,44 @@
+# This script (contains token — never upload)
+🔗 Push All to GitHub.command
+🚀 Deploy Website to Server.command
+
+# Secrets & keys
+*.pem
+*.key
+*.p12
+.env
+.env.*
+secrets.json
+.git-token
+*credentials*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Node / Expo
+node_modules/
+.expo/
+*.log
+npm-debug.log*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/

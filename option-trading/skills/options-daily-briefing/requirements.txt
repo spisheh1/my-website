@@ -1,0 +1,16 @@
+# Options Daily Briefing — Dependencies
+# Install with:  pip install -r requirements.txt
+
+# Core (required for everything)
+flask>=3.0.0          # live web server
+matplotlib>=3.7.0     # chart generation (for static export mode)
+numpy>=1.24.0         # math
+pandas>=2.0.0         # data handling
+
+# Live market data + order execution (required for live mode)
+alpaca-py>=0.20.0     # Alpaca Markets API
+# Sign up free at https://alpaca.markets — paper trading is free
+# Paper trading = no real money at risk
+
+# Live data fetching (alternative to Alpaca for data-only)
+yfinance>=0.2.40      # free but 15-min delayed options data

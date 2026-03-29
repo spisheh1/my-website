@@ -1,0 +1,13 @@
+{
+  "eval_id": 2,
+  "eval_name": "fomc-hawkish-spy",
+  "prompt": "The Fed meeting is on Wednesday at 2pm. It's currently Monday morning. The market expects a 25bps hold but there's talk of a hawkish surprise. SPY is at $505. How should I position my options for this event?",
+  "assertions": [
+    {"id": "a1", "text": "Identifies the FOMC timing mechanics (2pm decision, 2:30pm press conference)"},
+    {"id": "a2", "text": "Advises that IV peaks on Wednesday morning (before the decision) - good time to sell"},
+    {"id": "a3", "text": "Provides at least two distinct strategy options (e.g., directional bearish AND neutral premium-selling)"},
+    {"id": "a4", "text": "Gives specific SPY strike guidance or delta guidance for the recommended trade"},
+    {"id": "a5", "text": "Mentions sector impact (financials, rate-sensitive sectors like utilities/REITs)"},
+    {"id": "a6", "text": "Addresses exit timing (when to close relative to the Wednesday event)"}
+  ]
+}

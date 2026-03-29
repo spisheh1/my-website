@@ -1,0 +1,25 @@
+{
+  "skill_name": "options-news-impact",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "NVDA reports earnings next Tuesday after close. The stock is at $880. The ATM straddle is priced at $45. IVR is 82. I'm thinking of buying a straddle. Is that smart? What would you do instead?",
+      "expected_output": "Explains why buying a straddle at IVR 82 is risky due to IV crush, calculates the expected move from the straddle price ($45 = ~5% move), warns that NVDA historically moves within the expected range ~70% of the time, recommends selling the IV instead (iron condor or short strangle with defined risk), provides specific strikes and timing."
+    },
+    {
+      "id": 2,
+      "prompt": "The Fed meeting is on Wednesday at 2pm. It's currently Monday morning. The market expects a 25bps hold but there's talk of a hawkish surprise. SPY is at $505. How should I position my options for this event?",
+      "expected_output": "Explains the FOMC timing mechanics (decision at 2pm, press conference at 2:30pm), identifies that IV will peak Wednesday morning, recommends specific strategy (iron condor on SPY if neutral, or directional spread if hawkish), advises on exact entry and exit timing relative to the 2pm announcement, identifies sectors most impacted (financials, rate-sensitive)."
+    },
+    {
+      "id": 3,
+      "prompt": "CPI comes out tomorrow morning at 8:30am. Analysts expect 3.1% but whisper numbers are hotter at 3.4%. SPY is at $510 right now and VIX is at 17. What options trade gives me the best risk/reward here?",
+      "expected_output": "Evaluates the hot CPI scenario and its impact on markets (bearish equities, bonds), explains the directional bias (bearish on SPY/QQQ if hot), recommends a specific strategy (put spread on SPY, or 0DTE/1DTE directional options), gives strikes and timing (enter tonight or pre-market, exit quickly after release), explains IV crush risk even on a correct directional call."
+    },
+    {
+      "id": 4,
+      "prompt": "I see massive unusual options activity on XYZ stock - someone bought 5,000 contracts of the $50 call expiring in 3 weeks when the stock is at $42 and normally only trades 100 contracts a day. Should I follow this trade? How do I think about this?",
+      "expected_output": "Explains how to interpret unusual options activity as a signal (not confirmation), lists possible legitimate reasons (hedge, covered call, institutional spread leg), recommends checking IV, checking for upcoming catalysts, checking if this could be the other leg of a complex spread, gives guidance on how to size a follow trade (small, defined risk), warns about FOMO chasing."
+    }
+  ]
+}

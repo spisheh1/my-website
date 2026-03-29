@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "options-news-impact", "runs": [{"id": "eval-1-nvda-earnings-straddle-with_skill", "prompt": "NVDA reports earnings next Tuesday after close. The stock is at $880. The ATM straddle is priced at $45. IVR is 82. I'm thinking of buying a straddle. Is that smart? What would you do instead?", "eval_id": 1, "outputs": [{"name": "response.md", "type": "text", "content": "# NVDA Earnings Straddle Analysis\n\n## Summary\n**Buying the ATM straddle at $45 is NOT smart.** The IV environment is expensive, and the expected move is already priced in. You are likely to lose money even if you're right on direction. I recommend selling premium instead of buying it.\n\n---\n\n## Part 1: The Math \u2014 What the Market Is Pricing In\n\n**Current Setup:**\n- Stock price: $880\n- ATM straddle price: $45\n- IVR: 82 (very high \u2014 this is the key problem)\n\n**Expected Move:**\nUsing the rule from the skill: Expected Move \u2248 ATM straddle price directly\n- **Expected move: ~$45 (5.1% move in either direction)**\n\nThis means the options market is pricing in an earnings move of roughly **$835\u2013$925** on NVDA.\n\n**IVR Context:**\n- IVR of 82 = options are **historically expensive** on NVDA\n- This is the 82nd percentile of historical IV \u2014 we're near the top of this stock's volatility range\n- High IVR = the market is already paying peak fear for this earnings event\n\n---\n\n## Part 2: The Earnings Paradox (Why Buying Straddles Loses)\n\nFrom the skill's research:\n> \"Studies show that ~70% of the time, a stock's actual post-earnings move is *smaller* than the options market's priced-in expected move.\"\n\n**What this means for NVDA:**\n1. There's a ~70% chance NVDA's move will be **less than $45** (less than 5.1%)\n2. Even if NVDA moves, say, $35 (3.9%), the straddle will lose money because:\n   - You paid $45 for the move\n   - The move was smaller than expected\n   - IV crush will destroy the remaining extrinsic value\n3. You would need a move of **more than $45** (>5.1%) just to break even after IV crush\n\n**Historical reality:**\n- Small earnings surprises: Stock moves 2\u20134%, straddle buyers lose 20\u201350%\n- In-line earnings: Stock moves 1\u20133%, straddle buyers lose 30\u201370%\n- Large beat/miss: Stock moves 5%+, straddle buyers can profit \u2014 but this is the 30% case\n\n**The odds are against you.** You're betting on the 30%, not the 70%.\n\n---\n\n## Part 3: Why IVR 82 Makes This Worse\n\nAt IVR 82, NVDA options are **expensive compared to their own history:**\n- You're paying **premium prices** for the earnings event\n- When IV crushes post-earnings (which it always does), you lose on both the vega decay AND the direction (unless you nail a massive move)\n- A better time to buy NVDA straddles would be after earnings when IV crushes and IVR drops to 30\u201350\n\n**The timing is backward.** You're buying when options are expensive, not cheap.\n\n---\n\n## Part 4: What You Should Do Instead\n\n### Option A: Sell Premium (Iron Condor) \u2014 **RECOMMENDED**\nThis is the high-probability play. You're betting on the 70% case.\n\n**Strategy:**\n- Sell a **1-week iron condor** on NVDA\n- Short strikes: 1 standard deviation beyond the expected move\n  - Short call spread: Sell 925 call / Buy 945 call\n  - Short put spread: Sell 835 put / Buy 815 put\n- Collect credit: ~$20\u201325 (roughly 45\u201355% of the $45 straddle price, with HALF the risk)\n- Profit if NVDA stays within the $835\u2013$925 range (which happens ~70% of the time)\n\n**Exit plan:**\n- Close the day before earnings (highest IV, take your 50%+ profit)\n- Or hold through earnings and close the next morning (once IV has crushed, you'll be profitable)\n\n**Risk vs. Reward:**\n- Max profit: ~$20\u201325 (the credit you collect)\n- Max loss: ~$20\u201325 (defined risk \u2014 the width of the spreads minus the credit)\n- You win if you're right (70% case), and your loss is capped\n\n---\n\n### Option B: Pre-Earnings IV Expansion Play (Medium Difficulty)\nIf you think NVDA will have a big move but want to avoid being a pure directional bet:\n\n**Strategy:**\n- Wait until **3\u20134 days before earnings** when IV is still rising but hasn't peaked yet\n- Buy a **straddle or strangle at a cheaper IV level**\n- Sell it **the morning of earnings**, when IV is at its absolute highest (before the gap)\n- Profit: From IV expansion, NOT from the move itself\n\n**Why this is better than buying now:**\n- You'd be buying at lower IV, selling at higher IV (favorable timing)\n- You pocket the IV premium before the actual move\n- You're not holding through the event itself (no gap risk)\n\n**Timing constraint:**\n- Today (if earnings is next Tuesday after close) = 7 days out\n- This window is already closing; you'd need to do this in the next 2\u20133 days, not today\n\n---\n\n### Option C: Post-Earnings Directional Play (Safest)\n**Strategy:**\n- Skip the straddle entirely\n- Wait for earnings to release and IV to crush\n- If the earnings narrative is clear (beat \u2192 NVDA will trend up; miss \u2192 trend down), buy calls or puts the next morning\n- Use **call spreads or put spreads** (defined risk), not naked options\n- Target the post-earnings drift (stocks that beat tend to drift higher for 5\u201320 days)\n\n**Why this works:**\n- IV is now cheap again (IVR will drop to 40\u201360)\n- You're buying when options are underpriced, not overpriced\n- You're entering after the gap risk is resolved\n- You have a clearer narrative (the actual earnings result) to guide your trade\n\n---\n\n## Part 5: The Risk if You Buy the Straddle Anyway\n\n**Scenario Analysis:**\n\n| Outcome | NVDA Move | Straddle Value (post-crush) | Your P&L |\n|---|---|---|---|\n| Miss badly (down 8%) | -$70 | ~$50 | -$0 to +$5 (you break even or small loss) |\n| Miss moderately (down 4%) | -$35 | ~$20 | -$25 loss |\n| In-line (up 2%) | +$18 | ~$10 | -$35 loss |\n| Beat moderately (up 4%) | +$35 | ~$20 | -$25 loss |\n| Beat big (up 8%) | +$70 | ~$50 | -$0 to +$5 (you break even or small loss) |\n\n**The brutal truth:**\n- You only profit if NVDA moves **more than $45** (~5.1%)\n- Most earnings moves (70%) are **less than 5%**\n- Even when you're right on direction, IV crush eats your profit\n\n---\n\n## Part 6: The Checklist for This Trade (From the Skill)\n\nLet's go through the earnings timing checklist:\n\n- [ ] **What is the current IVR?** 82 = **Expensive** \u2014 Favors SELLING, not buying\n- [ ] **What is the options-implied expected move?** $45 (5.1%) \u2014 Check NVDA's actual post-earnings move history: Does NVDA usually move more or less than 5% on earnings?\n- [ ] **How has NVDA historically reacted to earnings?** NVDA has had huge post-earnings moves in the past, but the $45 price suggests the market is already pricing in a large expected move. Has it consistently moved MORE than 5% on earnings?\n- [ ] **What does the options chain skew say?** (Not provided, but check for elevated put skew \u2014 that would suggest fear of downside)\n- [ ] **What time does earnings release?** After close Tuesday \u2014 No gap risk overnight, but IV will crush immediately after the report\n\n**Verdict:** The checklist says \"SELL premium, don't buy it.\"\n\n---\n\n## Part 7: My Recommendation\n\n### What I Would Do:\n\n1. **If I'm neutral on direction:** Sell an **iron condor** for 7 DTE, take 50% profit the day before earnings or the next morning. This wins ~70% of the time and you control your risk.\n\n2. **If I'm bullish on NVDA:** Don't buy the straddle. Instead:\n   - Wait until the morning after earnings\n   - Buy a **call spread** (bull call spread) with cheap IV\n   - Or position for the post-earnings drift with defined-risk calls\n\n3. **If I'm bearish on NVDA:** Don't buy the straddle. Instead:\n   - Sell a **put spread** (bull put spread) before earnings \u2014 collect premium while you wait\n   - Or buy a **put spread** after earnings with cheap IV\n\n4. **If I want to bet on a big move but am unsure of direction:** Sell the iron condor (you profit if it's a small move OR a move in your range). This is the high-probability trade.\n\n---\n\n## Part 8: The Core Principle\n\nFrom the skill:\n> \"It's not just about direction \u2014 it's about whether the move is bigger or smaller than the market expected, and what IV does before and after.\"\n\n**You're about to buy when:**\n- The market has already expected a $45 move\n- IV is at the 82nd percentile (expensive)\n- Historically, 70% of earnings move LESS than expected\n- IV crush will hurt you even if you're right on direction\n\n**This violates the core principle.** You're buying into an event where the odds favor smaller-than-expected moves, and you're paying peak price to do it.\n\n**Sell instead. The edge is on the short side of this earnings event.**\n\n---\n\n## Conclusion\n\n**Is buying the straddle smart?** No.\n\n**What would I do instead?** Sell an iron condor for 7 DTE, collecting ~$20\u201325 in premium with defined risk. Profit if NVDA stays within the expected move range (70% historical probability). Exit the day before earnings to lock in profits before IV crush hits. This is the high-probability, risk-managed approach to the NVDA earnings event.\n\nIf you insist on buying, wait until **after earnings** when IV crushes and options become cheap again. Then enter a directional spread based on the actual earnings result.\n"}], "grading": null}, {"id": "eval-1-nvda-earnings-straddle-without_skill", "prompt": "NVDA reports earnings next Tuesday after close. The stock is at $880. The ATM straddle is priced at $45. IVR is 82. I'm thinking of buying a straddle. Is that smart? What would you do instead?", "eval_id": 1, "outputs": [{"name": "response.md", "type": "text", "content": "# NVDA Earnings Straddle Analysis\n\n## Your Situation\n- Stock price: $880\n- ATM straddle cost: $45\n- Implied Volatility Rank (IVR): 82\n- Event: Earnings next Tuesday after close\n- Your consideration: Buy the straddle\n\n## Analysis\n\n### Is buying the straddle smart?\n\n**Short answer: It's a risky bet at these parameters.**\n\nHere's why:\n\n1. **High IV Environment Creates \"IV Crush\" Risk**\n   - With IVR at 82, implied volatility is near historically high levels\n   - Earnings typically cause IV to spike beforehand, then collapse after the event\n   - When IV collapses post-earnings, your option premium value drops significantly\n   - Even if the stock moves, you may still lose money due to the IV crush\n\n2. **Cost-to-Potential-Movement Ratio**\n   - The straddle costs $45 (5.1% of stock price)\n   - This implies the market expects roughly a 5.1% move in either direction\n   - At $880, this is approximately \u00b1$45 move ($835-$925 range)\n   - Historically, NVDA earnings moves have varied, but you need a move larger than the premium paid to break even\n   - Plus, you need to overcome the IV crush effect\n\n3. **Timing Risk**\n   - You're buying into inflated IV (already at 82)\n   - Professional traders often sell options into high-IV events rather than buy them\n   - You're essentially betting against market consensus about volatility\n\n### What I Would Do Instead\n\n**Option 1: Sell Premium (Opposite Bet)**\n- Sell the straddle or strangle at current high IV levels\n- Collect the $45 premium\n- Profit if NVDA's move is smaller than expected\n- Risks: Unlimited downside if stock crashes, significant upside if it rallies hard\n\n**Option 2: Directional Spread Instead of Straddle**\n- If you have conviction on direction, use a call spread (bullish) or put spread (bearish)\n- Spreads reduce cost and defined risk\n- Limits your losses to the amount spent\n- More realistic risk/reward given high IV\n\n**Option 3: Wait for Post-Earnings**\n- Buy the straddle AFTER earnings once IV has crushed\n- Option premiums will be cheaper after the event\n- Volatility expansion might give you better odds for non-earnings moves\n- Eliminates the \"buying at the worst time\" risk\n\n**Option 4: Do Nothing**\n- If uncertain, sit out\n- There will be other trading opportunities\n- Avoid overpaying for event risk\n\n### Key Takeaway\nThe market is pricing in significant volatility. Buying options when IV is this high means you're paying peak prices. Either you have very strong conviction on a specific direction (use spreads instead), or wait for a better entry point after the volatility collapse. Buying straddles into earnings with 82 IVR is typically a \"fade the crowd\" trade that usually doesn't work.\n\n**Risk/Reward: Unfavorable at current parameters.** Consider alternatives.\n"}], "grading": null}, {"id": "eval-2-fomc-hawkish-spy-with_skill", "prompt": "The Fed meeting is on Wednesday at 2pm. It's currently Monday morning. The market expects a 25bps hold but there's talk of a hawkish surprise. SPY is at $505. How should I position my options for this event?", "eval_id": 2, "outputs": [{"name": "response.md", "type": "text", "content": "# FOMC Hawkish Surprise Positioning \u2014 SPY Options Strategy\n\n## Event Summary\n- **Event**: FOMC Meeting (Federal Reserve Interest Rate Decision)\n- **Timing**: Wednesday at 2:00 PM ET (currently Monday morning)\n- **Time to Event**: ~46 hours\n- **Current Level**: SPY at $505\n- **Market Consensus**: 25 basis points hold expected\n- **Risk Factor**: Hawkish surprise possible (guidance signals potential for more future tightening or delay in rate cuts)\n\n---\n\n## The Two-Dimensional Framework\n\n### 1. Directional Impact (Delta)\n**Expected Outcome if Hawkish Surprise Occurs:**\n- A hawkish surprise (more hawkish tone than expected, higher rate projections in dot plot, or less dovish forward guidance) would be **bearish for equities**\n- SPY would likely face downward pressure \u2014 typical FOMC hawkish surprises move SPY 1\u20132% down intra-day\n- The index could test lower support levels as rate expectations shift higher\n\n**Market Expectations:**\n- The consensus \"25bps hold\" prices in a pause, which is already neutral to slightly bullish (relief from no rate hikes)\n- A hawkish surprise **breaks this consensus**, so the move could exceed normal range if the Fed signals future action\n\n### 2. Volatility Impact (Vega / IV Crush)\n**Pre-FOMC Environment (Monday-Tuesday):**\n- IV is currently **rising** into the Wednesday 2 PM announcement\n- This rising IV is a critical advantage for premium sellers\n- Post-FOMC, IV will **collapse immediately** once the decision/press conference resolves uncertainty\n- This IV crush will destroy long options positions if direction doesn't move more than expected\n\n**The Critical Insight:**\n- You can be right on direction (downward move) but still lose money if you buy options now\n- The options market is already pricing in a move; the question is whether a hawkish surprise exceeds that move\n- Expected Move Formula: Check the ATM straddle price on SPY to estimate what the market thinks the range is\n\n---\n\n## Pre-FOMC Expected Move Estimation\n\nWithout live option chain data, here's the framework:\n- **ATM Straddle** (Wednesday expiration, ATM 505 strike) would give you the precise expected move\n- For SPY on a Fed day with consensus \"hold\": typically **0.8\u20131.5% expected move** is priced in\n- At SPY 505, this equals roughly **$4\u2013$7.50 straddle value**\n- This means the market is pricing in SPY to potentially move to the **496.50\u2013508.50 range** (roughly)\n\n**If hawkish surprise hits:**\n- A surprise could move SPY **1.5\u20132.5% down** (500\u2013495 region) in the first hour\n- This would **exceed** the expected move, favoring long option buyers\n- But only if the move is larger than what's priced in\n\n---\n\n## Positioning Strategy for Hawkish Surprise Risk\n\n### **RECOMMENDED APPROACH: Defined-Risk Directional Spreads (Best Risk/Reward)**\n\n#### Strategy 1: Bear Call Spread (If Bearish on Hawkish Surprise)\n**If you believe a hawkish surprise is likely and will push SPY lower:**\n\n**Entry (Monday-Tuesday, before 2 PM Wednesday):**\n- **Sell** an SPY call spread: Sell 1 call at the 507 strike, Buy 1 call at the 510 strike\n- Expiration: Wednesday (0DTE)\n- Collect **~$0.50\u2013$1.00 credit** (precise amount depends on live IV and pricing)\n- Max profit: The credit received (~$50\u2013$100 per contract)\n- Max loss: The width minus the credit (e.g., $3.00 spread \u2013 $0.75 credit = $2.25 loss, or $225 per contract)\n\n**Why this works:**\n- You collect premium from elevated pre-FOMC IV (which peaks Wednesday morning)\n- If SPY stays flat or goes down, the call spread expires worthless and you keep the full credit\n- If there's a hawkish surprise, SPY likely drops and the spread profits\n- Defined risk protects you if the market rallies instead\n\n**Exit timing:**\n- **Day-of-event strategy**: Close this position at market open Wednesday (9:30 AM) or 1:45 PM (right before the 2 PM announcement) \u2014 IV will be at peak, locks in profit\n- Or hold through the event if risk feels acceptable\n\n#### Strategy 2: Put Debit Spread (Alternative if Strongly Bearish)\n**If you have high conviction on a hawkish surprise downward move:**\n\n**Entry (Monday-Tuesday):**\n- **Buy** 1 put at the 500 strike, **Sell** 1 put at the 495 strike\n- Wednesday expiration\n- Debit cost: **~$0.50\u2013$1.00** (buy the 500 put, offset by selling the 495)\n- Max profit: $5.00 (the width) minus the debit paid\n- Max loss: The debit paid (~$50\u2013$100)\n\n**Why this works:**\n- You get directional downside exposure with defined risk\n- Lower cost than buying a naked put\n- If hawkish surprise hits and SPY drops below 500, you profit\n- You avoid the IV crush risk because you're selling IV with the short leg\n\n**Exit timing:**\n- Close Wednesday after 2:30 PM (post-press conference) if SPY has moved lower \u2014 lock in profits before IV starts recovering\n- Or hold through expiration if SPY is near or below 500\n\n---\n\n### **PREMIUM SELLING APPROACH: Iron Condor (If Neutral but Want to Harvest Elevated IV)**\n\n**If you think the hold will hold and the hawkish surprise talk is overblown:**\n\n**Entry (Monday-Tuesday):**\n- **Sell** an iron condor structure:\n  - Sell 1 call spread: Sell 507 call, Buy 510 call\n  - Sell 1 put spread: Sell 503 put, Buy 500 put\n- Collect combined credit: **~$1.00\u2013$1.50** (both spreads combined)\n- Max profit: The credit collected (~$100\u2013$150 per contract)\n- Max loss: Limited to the distance between long and short legs\n\n**Why this works:**\n- You're harvesting the elevated IV going into the Fed announcement\n- You profit if SPY stays within the 500\u2013510 range through Wednesday\n- Statistics show ~70% of events don't move as far as the market prices in, so this favors the seller\n\n**Exit timing:**\n- **Ideal exit**: Day before FOMC (Tuesday close) at 50% profit \u2014 this captures the IV premium without holding through the announcement\n- Alternatively: Morning of Wednesday before 2 PM, same logic\n- **Avoid**: Holding through the 2 PM announcement if you've sold premium\n\n---\n\n## Risk Management & The Hawkish Surprise Scenario\n\n### Key Risks to Monitor\n\n1. **Surprise Hawkish Guidance**\n   - Fed signals more future rate hikes than currently priced in\n   - Powell's tone shifts from \"pause\" to \"more to do\"\n   - Dot plot projects higher terminal rate\n   - **Impact**: SPY likely drops 1.5\u20132.5%; your defined-risk spreads profit, but iron condor losses accelerate\n\n2. **Post-Conference Sell-off Acceleration**\n   - Market sells off during the 2:30 PM press conference (often more impactful than the 2 PM decision)\n   - **Impact**: Large moves favor naked long option buyers but hurt iron condor sellers\n\n3. **Liquidity Gap at 2 PM Announcement**\n   - Options markets can gap sharply; bid-ask spreads widen\n   - Your exit may be hard to time perfectly\n   - **Mitigation**: Close pre-announcement (before 1:45 PM) to ensure liquidity\n\n4. **IV Crush Post-Decision**\n   - Even if SPY moves lower as expected, IV collapse can offset your profit\n   - **Example**: SPY down 1.5%, but your long put position loses value due to IV crush\n   - **Mitigation**: Use defined-risk spreads (put spreads) where you're selling IV to offset this\n\n---\n\n## Specific Trade Recommendations\n\n### For Bearish Hawkish-Surprise Conviction: Bear Call Spread\n\n| Element | Details |\n|---------|---------|\n| **Structure** | Sell SPY 507 call / Buy SPY 510 call |\n| **Expiration** | Wednesday (0DTE) |\n| **Entry Time** | Monday-Tuesday before 12 PM |\n| **Credit Received** | ~$0.50\u2013$1.00 per spread |\n| **Max Profit** | ~$50\u2013$100 per contract |\n| **Max Loss** | ~$200\u2013$300 per contract |\n| **Profit Zone** | SPY stays below 507 through Wednesday |\n| **Exit Strategy** | Wednesday morning 1:45 PM or earlier |\n\n**Rationale**: Defined risk, benefits from both downside direction and IV peak before announcement, profit from hawkish surprise if it occurs.\n\n---\n\n### For Balanced Hawkish Uncertainty: Iron Condor (Premium Sell)\n\n| Element | Details |\n|---------|---------|\n| **Structure** | Sell 507/510 call spread + Sell 503/500 put spread |\n| **Expiration** | Wednesday (0DTE) or Thursday if more time value desired |\n| **Entry Time** | Monday-Tuesday |\n| **Credit Received** | ~$1.00\u2013$1.50 combined |\n| **Max Profit** | ~$100\u2013$150 per contract |\n| **Max Loss** | Limited to spread width minus credit |\n| **Profit Zone** | SPY stays 500\u2013510 through Wednesday |\n| **Exit Strategy** | **Tuesday before close at 50% profit** (ideal) or Wednesday morning before 2 PM |\n\n**Rationale**: Harvests elevated IV without taking directional risk; statistically ~70% of events stay within the expected move. Exit before the event resolves to lock in premium.\n\n---\n\n### For Strongly Bearish Directional View: Put Debit Spread\n\n| Element | Details |\n|---------|---------|\n| **Structure** | Buy SPY 500 put / Sell SPY 495 put |\n| **Expiration** | Wednesday (0DTE) |\n| **Entry Time** | Monday-Tuesday |\n| **Debit Paid** | ~$0.50\u2013$1.00 |\n| **Max Profit** | ~$400\u2013$500 per contract (width minus debit) |\n| **Max Loss** | ~$50\u2013$100 per contract (debit paid) |\n| **Profit Zone** | SPY drops below 500; max profit if below 495 |\n| **Exit Strategy** | Wednesday afternoon post-press conference (2:30 PM+) |\n\n**Rationale**: Directional bet with defined risk; benefits from downside move if hawkish surprise occurs, avoids full IV crush impact due to short leg offsetting IV decline.\n\n---\n\n## Timing Checklist (Pre-FOMC)\n\nBefore entering any position, verify:\n\n- [ ] **Current IV level**: Is IV elevated (expected for pre-FOMC)? YES \u2014 this favors selling premium\n- [ ] **Expected move**: Estimate from straddle or options chain what SPY range is priced in for Wednesday move\n- [ ] **Directional conviction**: Do you believe hawkish surprise will happen? (If yes, directional spreads; if uncertain, iron condor)\n- [ ] **Time to event**: ~46 hours remaining \u2014 enough time for IV to peak, close by 1:45 PM Wednesday to avoid gap risk\n- [ ] **Recent Fed speaker activity**: Any recent commentary from Fed officials that might preview hawkish tone? Check market expectations\n- [ ] **Technical setup**: Is SPY testing support or resistance levels that could accelerate the move?\n\n---\n\n## Post-FOMC Strategy (After Decision)\n\n**Once the 2:30 PM press conference concludes:**\n- **If hawkish surprise confirmed**: SPY has likely dropped 1.5\u20132.5%; IV has crushed down\n  - Opportunity: Options are now cheap. Buy directional calls or puts based on the new trend\n  - Wait 30 minutes post-decision for volatility to settle, then enter a new position with fresh IV\n\n- **If hold confirmed (no surprise)**: SPY may rally or stay flat; IV crushes anyway\n  - Opportunity: Post-event options are cheaper; if you believe a new trend emerges, enter directional spreads\n  - Expect the market to move higher (relief that no shock occurred) or sideways\n\n---\n\n## Key Takeaways\n\n1. **Current environment favors premium sellers** (Monday-Tuesday, pre-FOMC): IV is elevated, making iron condors or call spreads attractive\n\n2. **If you believe hawkish surprise is likely**: Use defined-risk spreads (bear call spread or put debit spread), not naked long options \u2014 they protect you from IV crush while capturing directional downside\n\n3. **Best exit is before 2 PM Wednesday**: Close positions at 1:45 PM or earlier to lock in IV premium and avoid binary event risk\n\n4. **Avoid holding naked long options into 2 PM**: IV collapse will offset directional gains unless the move is very large (>2%)\n\n5. **The hawkish surprise scenario is priced in at some level**: The expected move already reflects tail risk. Only trade this if you believe the surprise exceeds what's currently priced in\n\n---\n\n## Final Recommendation Summary\n\n**Balanced Approach (Recommended for Monday Morning Entry):**\n- **Primary position**: Sell iron condor (507/510 calls + 503/500 puts), exit Tuesday at 50% profit\n- **Hedge position** (if you're genuinely concerned about hawkish surprise): Buy 1 put debit spread (500/495) as a tail hedge\n- **Stop loss**: If SPY moves against the iron condor direction by >1.5% before exit, close the position to avoid run-away loss\n\nThis approach harvests elevated pre-FOMC IV (which rewards sellers) while maintaining some directional optionality if the hawkish surprise actually occurs. The key is exiting before the 2 PM decision resolves the uncertainty, capturing premium rather than betting on direction alone.\n"}], "grading": null}], "previous_feedback": {}, "previous_outputs": {}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>
